@@ -216,7 +216,10 @@ class ModbusMaster
     uint8_t  maskWriteRegister(uint16_t, uint16_t, uint16_t);
     uint8_t  readWriteMultipleRegisters(uint16_t, uint16_t, uint16_t, uint16_t);
     uint8_t  readWriteMultipleRegisters(uint16_t, uint16_t);
-    
+    // write buffer data directliy into struct, array or anything else
+    template <typename T>
+    void read_data_into(uint8_t start_index, T& dest_ref) const;
+
   private:
     Stream* _serial;                                             ///< reference to serial port object
     uint8_t  _u8MBSlave;                                         ///< Modbus slave (1..255) initialized in begin()
@@ -260,9 +263,6 @@ class ModbusMaster
     void (*_preTransmission)();
     // postTransmission callback function; gets called after a Modbus message has been sent
     void (*_postTransmission)();
-
-    // write buffer data directliy into struct, array or anything else
-    void read_data_into(uint8_t start_index, T& dest_ref) const;
 };
 #endif
 
