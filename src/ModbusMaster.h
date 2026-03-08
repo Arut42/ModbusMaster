@@ -260,6 +260,9 @@ class ModbusMaster
     void (*_preTransmission)();
     // postTransmission callback function; gets called after a Modbus message has been sent
     void (*_postTransmission)();
+
+    // write buffer data directliy into struct, array or anything else
+    void read_data_into(uint8_t start_index, T& dest_ref) const;
 };
 #endif
 
