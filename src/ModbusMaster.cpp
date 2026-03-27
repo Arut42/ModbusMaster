@@ -29,6 +29,9 @@ Arduino library for communicating with Modbus slaves over RS232/485 (via RTU pro
 /* _____PROJECT INCLUDES_____________________________________________________ */
 #include "ModbusMaster.h"
 
+/* _____PROJECT INCLUDES_____________________________________________________ */
+// functions to calculate Modbus Application Data Unit CRC
+#include "util/crc16.h"
 
 /* _____GLOBAL VARIABLES_____________________________________________________ */
 
