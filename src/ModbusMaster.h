@@ -217,18 +217,17 @@ class ModbusMaster
         
         // 1. STATISCHE PRÜFUNGEN zur Kompilierzeit
         constexpr size_t REG_SIZE = sizeof(uint16_t);
-        
+        constexpr size_t TOTAL_SIZE = sizeof(T);
         // Stellen Sie sicher, dass der Zieltyp T ein Vielfaches von 16 Bit (2 Bytes) ist.
-        static_assert(sizeof(T) % REG_SIZE == 0 && sizeof(T) > 0, 
-                      "Zieltyp T muss eine Größe haben, die ein Vielfaches von 16 Bit (2 Bytes) ist.");
-    
+        static_assert(TOTAL_SIZE % REG_SIZE == 0 && TOTAL_SIZE > 0, "Typ T muss ein Vielfaches von 16 Bit sein.");    
         // 2. GRENZPRÜFUNG zur Laufzeit
-        constexpr size_t REQUIRED_REGS = sizeof(T) / REG_SIZE;
+        constexpr size_t REQUIRED_REGS = TOTAL_SIZE / REG_SIZE;
         
         if (start_index + REQUIRED_REGS > ku8MaxBufferSize) {
             // Fehlerbehandlung: Pufferüberlauf. Schreiben Sie einen sicheren Wert (0) und brechen ab.
             // Dies ist erforderlich, da die Funktion void zurückgibt und keine Ausnahme wirft.
-            dest_ref = {}; // Initialisiert den Zielspeicher mit 0 (oder Standardwert)
+            std::memset(&dest_ref, 0, TOTAL_SIZE);  
+            //dest_ref = {}; // Initialisiert den Zielspeicher mit 0 (oder Standardwert)
             return; 
         }
     
