@@ -239,6 +239,12 @@ uint16_t ModbusMaster::getResponseBuffer(uint8_t u8Index)
     return 0xFFFF;
   }
 }
+/**
+  Get Pointer to internal Buffer for faster access
+*/
+uint16_t *ModbusMaster::getResponseBufferPointer() {
+  return _u16ResponseBuffer;
+}
 
 
 /**
@@ -878,39 +884,5 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
   return u8MBStatus;
 }
 
-template <typename T>
-void ModbusMaster::read_data_into(uint8_t start_index, T& dest_ref) const {
-    
-    // 1. STATISCHE PRÜFUNGEN zur Kompilierzeit
-    constexpr size_t REG_SIZE = sizeof(uint16_t);
-    
-    // Stellen Sie sicher, dass der Zieltyp T ein Vielfaches von 16 Bit (2 Bytes) ist.
-    static_assert(sizeof(T) % REG_SIZE == 0 && sizeof(T) > 0, 
-                  "Zieltyp T muss eine Größe haben, die ein Vielfaches von 16 Bit (2 Bytes) ist.");
 
-    // 2. GRENZPRÜFUNG zur Laufzeit
-    constexpr size_t REQUIRED_REGS = sizeof(T) / REG_SIZE;
-    
-    if (start_index + REQUIRED_REGS > ku8MaxBufferSize) {
-        // Fehlerbehandlung: Pufferüberlauf. Schreiben Sie einen sicheren Wert (0) und brechen ab.
-        // Dies ist erforderlich, da die Funktion void zurückgibt und keine Ausnahme wirft.
-        dest_ref = {}; // Initialisiert den Zielspeicher mit 0 (oder Standardwert)
-        return; 
-    }
-
-    // 3. DATENQUELLE und KOPIE
-    
-    // Pointer auf das Startregister im internen Modbus-Puffer
-    const uint16_t* p_source = _u16ResponseBuffer + start_index;
-
-    // Alignment-sicheres Kopieren des gesamten Datenblocks.
-    // std::memcpy überbrückt die Unterschiede in Alignment und Strict Aliasing Rule.
-    // Die Daten werden direkt in den Speicher von 'dest_ref' kopiert.
-    std::memcpy(&dest_ref, p_source, sizeof(T));
-    
-    // An diesem Punkt ist der Wert in 'dest_ref' gespeichert.
-    // Wenn Ihr Protokoll Modbus Big-Endian (High-Word, Low-Word) verwendet, 
-    // und Sie Little-Endian sind, MÜSSTE hier ein Word-Swap erfolgen.
-    // Da Ihre Tests zeigten, dass KEIN Swap nötig ist, wird hier nichts getan.
-}
 
